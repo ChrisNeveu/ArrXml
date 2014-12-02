@@ -3,7 +3,7 @@ import Keys._
 
 object BuildSettings {
 
-	val scalaV = "2.11.4"
+	val scalaV = "2.11.3"
 	
 	val buildSettings = Defaults.defaultSettings ++ Seq(
 		organization	:= "arrxml",
@@ -20,6 +20,6 @@ object ArrXmlBuild extends Build {
 		file("."),
 		settings = buildSettings ++ Seq(
 			libraryDependencies := Seq(
-				"org.jsoup" % "jsoup" % "1.8.1"))
+				"org.jsoup" % "jsoup" % "1.7.2"))
 	)
 }
