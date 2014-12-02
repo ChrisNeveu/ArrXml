@@ -19,7 +19,7 @@ object ArrXmlBuild extends Build {
 		"root",
 		file("."),
 		settings = buildSettings ++ Seq(
-			libraryDependencies := Seq(
+			libraryDependencies ++= Seq(
 				"org.jsoup" % "jsoup" % "1.8.1"))
 	)
 }
