@@ -1,0 +1,4 @@
+package arrxml
+
+object ArrXml {
+}
