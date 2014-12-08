@@ -1,7 +1,5 @@
 package arrxml.arrow
 
-import scalaz.{ Arrow, Kleisli, MonadPlus }
-
 trait ArrowList[=>>[-_, +_]] extends ArrowPlus[=>>] with ArrowApply[=>>] {
 
    /**
@@ -321,4 +319,21 @@ trait ArrowList[=>>[-_, +_]] extends ArrowPlus[=>>] with ArrowApply[=>>] {
     */
    def seqA[B](as : List[B =>> B]) : B =>> B =
       as.foldLeft(self[B])(>>>[B, B, B] _)
+}
+
+object ArrowList {
+   @inline def apply[F[-_, +_]](implicit ev : ArrowList[F]) : ArrowList[F] = ev
+}
+
+trait ArrowListOps[=>>[-_, +_], A, B] {
+   def _self : A =>> B
+   implicit def F : ArrowList[=>>]
+
+   final def >>%[C](f : List[B] ⇒ List[C]) : A =>> C = F.>>%(_self, f)
+   final def >%[C](f : List[B] ⇒ C) : A =>> C = F.>%(_self, f)
+}
+
+trait ToArrowListOps {
+   implicit def ToArrowPlusOps[F[-_, +_], A, B](v : F[A, B])(implicit ev : ArrowList[F]) =
+      new ArrowListOps[F, A, B] { def _self = v; implicit def F : ArrowList[F] = ev }
 }
