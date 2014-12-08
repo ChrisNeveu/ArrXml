@@ -1,6 +1,7 @@
 package object arrxml {
    type Attribute = org.jsoup.nodes.Attribute
    type Attributes = org.jsoup.nodes.Attributes
+   type Comment = org.jsoup.nodes.Comment
    type DataNode = org.jsoup.nodes.DataNode
    type Document = org.jsoup.nodes.Document
    type DocumentType = org.jsoup.nodes.DocumentType
