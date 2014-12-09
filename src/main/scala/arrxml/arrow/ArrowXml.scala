@@ -2,6 +2,9 @@ package arrxml.arrow
 
 import arrxml.{ Node, TextNode, Comment, Element }
 
+import annotation.implicitNotFound
+
+@implicitNotFound(msg = "No instance in scope for ArrowXml[${=>>}].")
 trait ArrowXml[=>>[-_, +_]] extends ArrowList[=>>] with ArrowTree[=>>] {
 
    // These types are not yet implemented.
@@ -604,4 +607,8 @@ trait ArrowXml[=>>[-_, +_]] extends ArrowList[=>>] with ArrowTree[=>>] {
     *
     */
    def xshowBlob[N] : (N =>> Node) ⇒ (N =>> Blob)
+}
+
+object ArrowXml {
+   @inline def apply[F[-_, +_]](implicit ev : ArrowXml[F]) : ArrowXml[F] = ev
 }

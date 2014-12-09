@@ -1,7 +1,8 @@
 package arrxml.arrow
 
-import scalaz.{ Arrow, Kleisli, MonadPlus }
+import annotation.implicitNotFound
 
+@implicitNotFound(msg = "No instance in scope for ArrowTree[${=>>}].")
 trait ArrowTree[=>>[-_, +_]] extends ArrowPlus[=>>] with ArrowIf[=>>] {
    /**
     * construct a leaf
@@ -186,4 +187,8 @@ trait ArrowTree[=>>[-_, +_]] extends ArrowPlus[=>>] with ArrowIf[=>>] {
     * into a document. The holes can be filled with contents from the input.
     */
    def insertTreeTemplate[T[_] : Tree, A, B] : (T[A] =>> T[A]) ⇒ IfThen[T[A] =>> B, T[A] =>> T[A]] ⇒ (T[A] =>> T[A])
+}
+
+object ArrowTree {
+   @inline def apply[F[-_, +_]](implicit ev : ArrowTree[F]) : ArrowTree[F] = ev
 }

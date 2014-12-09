@@ -1,5 +1,8 @@
 package arrxml.arrow
 
+import annotation.implicitNotFound
+
+@implicitNotFound(msg = "No instance in scope for Tree[${T}].")
 trait Tree[T[_]] {
    /**
     * construct a leaf
@@ -77,4 +80,8 @@ trait Tree[T[_]] {
     *  a /graphical/ representation of the tree in text format
     */
    def formatTree[A](f : A ⇒ String)(tree : T[A]) : String
+}
+
+object Tree {
+   @inline def apply[F[_]](implicit ev : Tree[F]) : Tree[F] = ev
 }

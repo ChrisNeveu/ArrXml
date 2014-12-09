@@ -1,5 +1,8 @@
 package arrxml.arrow
 
+import annotation.implicitNotFound
+
+@implicitNotFound(msg = "No instance in scope for ArrowIf[${=>>}].")
 trait ArrowIf[=>>[-_, +_]] extends ArrowList[=>>] {
 
    /**
@@ -117,6 +120,29 @@ trait ArrowIf[=>>[-_, +_]] extends ArrowList[=>>] {
     */
    def partitionA[A] : (A =>> A) ⇒ (A ⇒ Boolean) ⇒ (A =>> A)
 
+}
+
+object ArrowIf {
+   @inline def apply[F[-_, +_]](implicit ev : ArrowIf[F]) : ArrowIf[F] = ev
+}
+
+trait ToArrowIfOps {
+   // For endoarrows.
+   implicit class ArrowIfOps0[=>>[-_, +_], A](v : A =>> A) {
+      final def when[B](predicate : A =>> B)(implicit ev : ArrowIf[=>>]) = ev.when(v)(predicate)
+      final def whenP(predicate : A ⇒ Boolean)(implicit ev : ArrowIf[=>>]) = ev.whenP(v)(predicate)
+      final def whenNot[B](predicate : A =>> B)(implicit ev : ArrowIf[=>>]) = ev.whenNot(v)(predicate)
+      final def whenNotP(predicate : A ⇒ Boolean)(implicit ev : ArrowIf[=>>]) = ev.whenNotP(v)(predicate)
+   }
+   implicit class ArrowIfOps1[=>>[-_, +_], A, B](v : A =>> B) {
+      final def guards[C](a : A =>> C)(implicit ev : ArrowIf[=>>]) = ev.guards(v)(a)
+   }
+}
+
+trait ToArrowIfFuncOps {
+   implicit class ArrowIfFuncOps[=>>[-_, +_], A](v : A ⇒ Boolean) {
+      final def guardsP[B](a : A =>> B)(implicit ev : ArrowIf[=>>]) = ev.guardsP(v)(a)
+   }
 }
 
 class IfThen[A, B]

@@ -1,7 +1,8 @@
 package arrxml.arrow
 
-import scalaz.{ Arrow, Kleisli, MonadPlus }
+import annotation.implicitNotFound
 
+@implicitNotFound(msg = "No instance in scope for ArrowList[${=>>}].")
 trait ArrowList[=>>[-_, +_]] extends ArrowPlus[=>>] with ArrowApply[=>>] {
 
    /**
@@ -68,7 +69,7 @@ trait ArrowList[=>>[-_, +_]] extends ArrowPlus[=>>] with ArrowApply[=>>] {
     *
     * example: @ foo >>. take 1 @ constructs a deterministic version of foo by deleting all further results
     */
-   def >>%[B, C, D](a : B =>> C, f : List[C] ⇒ List[D]) : B =>> D
+   def >>%[A, B, C](a : A =>> B, f : List[B] ⇒ List[C]) : A =>> C
 
    /**
     * combinator for converting the result of an arrow into a single element result
@@ -116,8 +117,8 @@ trait ArrowList[=>>[-_, +_]] extends ArrowPlus[=>>] with ArrowApply[=>>] {
     *
     * example: @ withDefault none \"abc\" @ is equivalent to @ constA \"abc\" @
     */
-   def withDefault[B, C](a : B =>> C, c : C) : B =>> C =
-      >>%(a, (cs : List[C]) ⇒ if (cs.isEmpty) List(c) else cs)
+   def withDefault[A, B](a : A =>> B, b : B) : A =>> B =
+      >>%(a, (bs : List[B]) ⇒ if (bs.isEmpty) List(b) else bs)
 
    /**
     * makes a list arrow deterministic, the number of results is at most 1
@@ -184,7 +185,7 @@ trait ArrowList[=>>[-_, +_]] extends ArrowPlus[=>>] with ArrowApply[=>>] {
     *
     * see also: 'applyA', '$<<', '$<<<', '$<<<<', '$<$'
     */
-   def %<[B, C, D](f : C ⇒ B =>> D, a : B =>> C) : B =>> D =
+   def %<[A, B, C](f : B ⇒ A =>> C, a : A =>> B) : A =>> C =
       applyA(>>>(a, arr(f)))
 
    /**
@@ -201,7 +202,7 @@ trait ArrowList[=>>[-_, +_]] extends ArrowPlus[=>>] with ArrowApply[=>>] {
     * > runLA ( infixString $<< constA "y"
     * >                         &&& (constA "z" <+> this) ) "x" = ["yxz", "yxx"]
     */
-   def %<[C1, C2, B, D](f : (C1, C2) ⇒ B =>> D, a : B =>> (C1, C2)) : B =>> D =
+   def %<[B1, B2, A, C](f : (B1, B2) ⇒ A =>> C, a : A =>> (B1, B2)) : A =>> C =
       applyA(>>>(a, arr(f)))
 
    /**
@@ -211,7 +212,7 @@ trait ArrowList[=>>[-_, +_]] extends ArrowPlus[=>>] with ArrowApply[=>>] {
     *
     * > f $<<< g1 &&& g2 &&& g3
     */
-   def %<[C1, C2, C3, B, D](f : (C1, C2, C3) ⇒ B =>> D, a : B =>> (C1, (C2, C3))) : B =>> D =
+   def %<[B1, B2, B3, A, C](f : (B1, B2, B3) ⇒ A =>> C, a : A =>> (B1, (B2, B3))) : A =>> C =
       applyA(>>>(a, arr(f)))
 
    /**
@@ -221,7 +222,7 @@ trait ArrowList[=>>[-_, +_]] extends ArrowPlus[=>>] with ArrowApply[=>>] {
     *
     * > f $<<<< g1 &&& g2 &&& g3 &&& g4
     */
-   def %<[C1, C2, C3, C4, B, D](f : (C1, C2, C3, C4) ⇒ B =>> D, a : B =>> (C1, (C2, (C3, C4)))) : B =>> D =
+   def %<[B1, B2, B3, B4, A, C](f : (B1, B2, B3, B4) ⇒ A =>> C, a : A =>> (B1, (B2, (B3, B4)))) : A =>> C =
       applyA(>>>(a, arr(f)))
 
    /**
@@ -321,4 +322,34 @@ trait ArrowList[=>>[-_, +_]] extends ArrowPlus[=>>] with ArrowApply[=>>] {
     */
    def seqA[B](as : List[B =>> B]) : B =>> B =
       as.foldLeft(self[B])(>>>[B, B, B] _)
+}
+
+object ArrowList {
+   @inline def apply[F[-_, +_]](implicit ev : ArrowList[F]) : ArrowList[F] = ev
+}
+
+trait ToArrowListOps {
+   implicit class ArrowListOps[F[-_, +_], A, B](v : F[A, B]) {
+      final def >>%[C](f : List[B] ⇒ List[C])(implicit ev : ArrowList[F]) = ev.>>%(v, f)
+      final def >%[C](f : List[B] ⇒ C)(implicit ev : ArrowList[F]) = ev.>%(v, f)
+      final def withDefault(b : B)(implicit ev : ArrowList[F]) = ev.withDefault(v, b)
+   }
+}
+
+trait ToArrowListFuncOps {
+   implicit class ArrowListFuncOps0[=>>[-_, +_], A, B, C](v : B ⇒ A =>> C) {
+      def %<(a : A =>> B)(implicit ev : ArrowList[=>>]) = ev.%<(v, a)
+   }
+   implicit class ArrowListFuncOps1[=>>[-_, +_], A, B1, B2, C](v : (B1, B2) ⇒ A =>> C) {
+      def %<(a : A =>> (B1, B2))(implicit ev : ArrowList[=>>]) = ev.%<(v, a)
+   }
+   implicit class ArrowListFuncOps2[=>>[-_, +_], A, B1, B2, B3, C](v : (B1, B2, B3) ⇒ A =>> C) {
+      def %<(a : A =>> (B1, (B2, B3)))(implicit ev : ArrowList[=>>]) = ev.%<(v, a)
+   }
+   implicit class ArrowListFuncOps3[=>>[-_, +_], A, B1, B2, B3, B4, C](v : (B1, B2, B3, B4) ⇒ A =>> C) {
+      def %<(a : A =>> (B1, (B2, (B3, B4))))(implicit ev : ArrowList[=>>]) = ev.%<(v, a)
+   }
+   implicit class ArrowListFuncOps4[=>>[-_, +_], A, B](v : B ⇒ (A =>> A)) {
+      def %<(a : A =>> B)(implicit ev : ArrowList[=>>]) = ev.%<(v, a)
+   }
 }
