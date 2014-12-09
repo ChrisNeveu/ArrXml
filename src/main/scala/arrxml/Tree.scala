@@ -1,4 +1,4 @@
-package arrxml.arrow
+package arrxml.tree
 
 import annotation.implicitNotFound
 
@@ -12,7 +12,7 @@ trait Tree[T[_]] {
    /**
     * construct an inner node
     */
-   def mkTree[A, B] : A ⇒ List[T[A]] ⇒ T[A]
+   def mkTree[A, B](n : A, children : List[T[A]]) : T[A]
 
    /**
     * leaf test: list of children empty?
@@ -42,7 +42,7 @@ trait Tree[T[_]] {
    /**
     * edit children
     */
-   def changeChildren[A](f : T[A] ⇒ T[A])(tree : T[A]) : T[A]
+   def changeChildren[A](f : List[T[A]] ⇒ List[T[A]])(tree : T[A]) : T[A]
 
    /**
     * substitute node: @ setNode n = changeNode (const n) @
@@ -52,7 +52,7 @@ trait Tree[T[_]] {
    /**
     * substitute children: @ setChildren cl = changeChildren (const cl) @
     */
-   def setChildren[A](v : T[A])(tree : T[A]) : T[A]
+   def setChildren[A](children : List[T[A]])(tree : T[A]) : T[A]
 
    /**
     * fold for trees
