@@ -9,6 +9,13 @@ object BuildSettings {
       organization := "org.arrxml"
     , version      := "0.0.1-SNAPSHOT"
     , scalaVersion := scalaV
+    , scalacOptions ++= Seq(
+         "-unchecked"
+       , "-deprecation"
+       , "-feature"
+       , "-language:higherKinds"
+       , "-language:postfixOps"
+       )
     )
 }
 
