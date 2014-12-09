@@ -213,18 +213,18 @@ trait ArrowTree[=>>[-_, +_]] extends ArrowPlus[=>>] with ArrowIf[=>>] {
     * example: @ insertChildrenAt 0 (deep isCmt) @ selects all subtrees for which isCmt holds
     * and copies theses in front of the existing children
     */
-   def insertChildrenAt[T[_] : Tree, A] : Int ⇒ (T[A] =>> T[A]) ⇒ (T[A] =>> T[A])
+   def insertChildrenAt[T[_] : Tree, A] : Int ⇒ (T[A] =>> T[A]) ⇒ (T[A] =>> T[A]) // TODO implementation
 
    /**
     * similar to 'insertChildrenAt', but the insertion position is searched with a predicate
     */
-   def insertChildrenAfter[T[_] : Tree, A] : (T[A] =>> T[A]) ⇒ (T[A] =>> T[A]) ⇒ (T[A] =>> T[A])
+   def insertChildrenAfter[T[_] : Tree, A] : (T[A] =>> T[A]) ⇒ (T[A] =>> T[A]) ⇒ (T[A] =>> T[A]) // TODO implementation
 
    /**
     * an arrow for inserting a whole subtree with some holes in it (a template)
     * into a document. The holes can be filled with contents from the input.
     */
-   def insertTreeTemplate[T[_] : Tree, A, B] : (T[A] =>> T[A]) ⇒ IfThen[T[A] =>> B, T[A] =>> T[A]] ⇒ (T[A] =>> T[A])
+   def insertTreeTemplate[T[_] : Tree, A, B] : (T[A] =>> T[A]) ⇒ IfThen[T[A] =>> B, T[A] =>> T[A]] ⇒ (T[A] =>> T[A]) // TODO implementation
 }
 
 object ArrowTree {

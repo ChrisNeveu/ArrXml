@@ -83,7 +83,7 @@ trait ArrowIf[=>>[-_, +_]] extends ArrowList[=>>] {
    /**
     * @ f \`orElse\` g @ : directional choice: if f succeeds, the result of f is the result, else g is applied
     */
-   def orElse[A, B](a1 : A =>> B)(a2 : A =>> B) : (A =>> B)
+   def orElse[A, B](a1 : A =>> B)(a2 : A =>> B) : (A =>> B) // TODO implementation
 
    /**
     *
@@ -111,14 +111,14 @@ trait ArrowIf[=>>[-_, +_]] extends ArrowList[=>>] {
     *
     * example: @ runLA (spanA (isA (\/= \'-\'))) \"abc-def\" @ gives @ [(\"abc\",\"-def\")] @ as result
     */
-   def spanA[A] : (A =>> A) ⇒ (List[A] =>> (List[A], List[A]))
+   def spanA[A] : (A =>> A) ⇒ (List[A] =>> (List[A], List[A])) // TODO implementation
 
    /**
     * partition a list of values into a pair of lists
     *
     * This is the arrow Version of 'Data.List.partition'
     */
-   def partitionA[A] : (A =>> A) ⇒ (A ⇒ Boolean) ⇒ (A =>> A)
+   def partitionA[A] : (A =>> A) ⇒ (A ⇒ Boolean) ⇒ (A =>> A) // TODO implementation
 
 }
 
