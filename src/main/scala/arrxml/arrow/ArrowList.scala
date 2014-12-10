@@ -278,7 +278,8 @@ trait ArrowList[=>>[-_, +_]] extends ArrowPlus[=>>] with ArrowApply[=>>] {
     *
     * see also: 'applyA', '$<'
     */
-   def %<%[A, B](f : B ⇒ (A =>> A), a : A =>> B) : A =>> A // TODO implementation
+   def %<%[A, B](f : B ⇒ (A =>> A), a : A =>> B) : A =>> A =
+      applyA(>>>(listA(>>>(a, arr(f))), arr(seqA[A] _)))
 
    /**
     * merge the result pairs of an arrow with type @a a1 (b1, b2)@
@@ -296,7 +297,8 @@ trait ArrowList[=>>[-_, +_]] extends ArrowPlus[=>>] with ArrowApply[=>>] {
     *
     * see also: 'applyA', '$<' and '+=' in class 'Text.XML.HXT.Arrow.ArrowXml'
     */
-   def mergeA[A1, B1, C](f : (A1, B1) =>> A1 ⇒ (A1, B1) =>> B1 ⇒ (A1, B1) ⇒ C) : (A1, B1) =>> C // TODO implementation
+   def mergeA[A1, B1, C](f : (A1, B1) =>> A1 ⇒ (A1, B1) =>> B1 ⇒ (A1, B1) =>> C) : (A1, B1) =>> C =
+      %<(((a : (A1, B1)) ⇒ f(arr((tup : (A1, B1)) ⇒ tup._1))(constA(a._2))), self)
 
    /**
     * useful only for arrows with side effects: perform applies an arrow to the input

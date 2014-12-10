@@ -111,14 +111,27 @@ trait ArrowIf[=>>[-_, +_]] extends ArrowList[=>>] {
     *
     * example: @ runLA (spanA (isA (\/= \'-\'))) \"abc-def\" @ gives @ [(\"abc\",\"-def\")] @ as result
     */
-   def spanA[A] : (A =>> A) ⇒ (List[A] =>> (List[A], List[A])) // TODO implementation
+   def spanA[A](a : A =>> A) : (List[A] =>> (List[A], List[A])) = {
+      val predicate = >>>(arrL((l : List[A]) ⇒ l.take(1)), a)
+      val split = combine(arr((l : List[A]) ⇒ l.head), >>>(arr((l : List[A]) ⇒ l.tail), spanA(a)))
+      val rejoin = arr((tup : (A, (List[A], List[A]))) ⇒ (tup._1 :: tup._2._1, tup._2._2))
+      val elseCase = arr((l : List[A]) ⇒ (List.empty[A], l))
+      ifA(predicate)(>>>(split, rejoin))(elseCase)
+   }
 
    /**
     * partition a list of values into a pair of lists
     *
     * This is the arrow Version of 'Data.List.partition'
     */
-   def partitionA[A] : (A =>> A) ⇒ (A ⇒ Boolean) ⇒ (A =>> A) // TODO implementation
+   def partitionA[A](a : A =>> A) : List[A] =>> (List[A], List[A]) = {
+      val part = listA(>>>(arrL((as : List[A]) ⇒ as), tagA(a)))
+      def untag(l : List[Either[A, A]]) = {
+         val (l1, l2) = l.partition(_.isLeft)
+         (l1.map(_.fold(((a : A) ⇒ a), ((a : A) ⇒ a))), l2.map(_.fold(((a : A) ⇒ a), ((a : A) ⇒ a))))
+      }
+      >>>(part, arr(untag _))
+   }
 
 }
 
