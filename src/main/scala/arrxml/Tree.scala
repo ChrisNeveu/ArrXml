@@ -7,7 +7,7 @@ trait Tree[T[_]] {
    /**
     * construct a leaf
     */
-   def mkLeaf[A] : A ⇒ T[A]
+   def mkLeaf[A](a : A) : T[A] = mkTree(a, List.empty)
 
    /**
     * construct an inner node
@@ -17,12 +17,12 @@ trait Tree[T[_]] {
    /**
     * leaf test: list of children empty?
     */
-   def isLeaf[A](tree : T[A]) : Boolean
+   def isLeaf[A](tree : T[A]) : Boolean = getChildren(tree).isEmpty
 
    /**
     * innner node test: @ not . isLeaf @
     */
-   def isInner[A](tree : T[A]) : Boolean
+   def isInner[A](tree : T[A]) : Boolean = !isLeaf(tree)
 
    /**
     * select node attribute
@@ -47,39 +47,36 @@ trait Tree[T[_]] {
    /**
     * substitute node: @ setNode n = changeNode (const n) @
     */
-   def setNode[A](v : A)(tree : T[A]) : T[A]
+   def setNode[A](v : A)(tree : T[A]) : T[A] = changeNode((_ : A) ⇒ v)(tree)
 
    /**
     * substitute children: @ setChildren cl = changeChildren (const cl) @
     */
-   def setChildren[A](children : List[T[A]])(tree : T[A]) : T[A]
+   def setChildren[A](children : List[T[A]])(tree : T[A]) : T[A] =
+      changeChildren((_ : List[T[A]]) ⇒ children)(tree)
 
    /**
     * fold for trees
     */
-   def foldTree[A, B](f : A ⇒ List[B] ⇒ B)(tree : T[A]) : B
+   def foldTree[A, B](f : (A, List[B]) ⇒ B)(tree : T[A]) : B
 
    /**
     * all nodes of a tree
     */
-   def nodesTree[A](tree : T[A]) : List[A]
+   def nodesTree[A](tree : T[A]) : List[A] =
+      foldTree((a : A, as : List[List[A]]) ⇒ a :: as.flatten)(tree)
 
    /**
     * depth of a tree
     */
-   def depthTree[A](tree : T[A]) : Int
+   def depthTree[A](tree : T[A]) : Int =
+      foldTree((_ : A, as : List[Int]) ⇒ 1 + (0 :: as).max)(tree)
 
    /**
     * number of nodes in a tree
     */
-   def cardTree[A](tree : T[A]) : Int
-
-   /**
-    * format tree for readable trace output
-    *
-    *  a /graphical/ representation of the tree in text format
-    */
-   def formatTree[A](f : A ⇒ String)(tree : T[A]) : String
+   def cardTree[A](tree : T[A]) : Int =
+      foldTree((_ : A, as : List[Int]) ⇒ 1 + as.sum)(tree)
 }
 
 object Tree {

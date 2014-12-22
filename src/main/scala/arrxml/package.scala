@@ -11,4 +11,6 @@ package object arrxml {
    type Node = org.jsoup.nodes.Node
    type TextNode = org.jsoup.nodes.TextNode
    type XmlDeclaration = org.jsoup.nodes.XmlDeclaration
+
+   type NodeTree[A <: Node] = A
 }
