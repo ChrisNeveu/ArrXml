@@ -15,7 +15,7 @@ trait ArrowTree[=>>[-_, +_]] extends ArrowPlus[=>>] with ArrowIf[=>>] {
     * construct an inner node
     */
    def mkTree[T[_] : Tree, A, B](n : A, children : List[T[A]]) : (B =>> T[A]) =
-      constA(implicitly[Tree[T]].mkTree(n, children))
+      constA(implicitly[Tree[T]].mkTree[A, B](n, children))
 
    /**
     * select the children of the root of a tree

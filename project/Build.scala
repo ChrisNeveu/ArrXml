@@ -1,5 +1,6 @@
 import sbt._
 import Keys._
+import wartremover._
 
 object BuildSettings {
 
@@ -15,7 +16,10 @@ object BuildSettings {
        , "-feature"
        , "-language:higherKinds"
        , "-language:postfixOps"
+       , "-Xlint:_"
+       , "-Ywarn-infer-any"
        )
+    , wartremoverErrors ++= Warts.allBut(Wart.ListOps)
     )
 }
 

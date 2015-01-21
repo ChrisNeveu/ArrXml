@@ -20,7 +20,7 @@ trait ArrowIf[=>>[-_, +_]] extends ArrowList[=>>] {
     * negation: @ neg f = ifA f none this @
     */
    def neg[A, B](a : A =>> B) : A =>> A =
-      ifA(a)(none)(self)
+      ifA(a)(none[A, A])(self)
 
    /**
     * @ f \`when\` g @ : when the predicate g holds, f is applied, else the identity filter this
@@ -50,19 +50,19 @@ trait ArrowIf[=>>[-_, +_]] extends ArrowList[=>>] {
     * @ g \`guards\` f @ : when the predicate g holds, f is applied, else none
     */
    def guards[A, B, C](predicate : A =>> B)(a : A =>> C) : (A =>> C) =
-      ifA(predicate)(a)(none)
+      ifA(predicate)(a)(none[A, C])
 
    /**
     * like 'whenP'
     */
    def guardsP[A, B](predicate : A ⇒ Boolean)(a : A =>> B) : (A =>> B) =
-      ifP(predicate)(a)(none)
+      ifP(predicate)(a)(none[A, B])
 
    /**
     * shortcut for @ f `guards` this @
     */
    def filterA[A, B](predicate : A =>> B) : (A =>> A) =
-      ifA(predicate)(self)(none)
+      ifA(predicate)(self)(none[A, A])
 
    /**
     * @ f \`containing\` g @ : keep only those results from f for which g holds
@@ -78,7 +78,7 @@ trait ArrowIf[=>>[-_, +_]] extends ArrowList[=>>] {
     * definition: @ f \`notContaining\` g = f >>> ifA g none this @
     */
    def notContaining[A, B, C](a1 : A =>> B)(a2 : B =>> C) : (A =>> B) =
-      >>>(a1, ifA(a2)(none)(self))
+      >>>(a1, ifA(a2)(none[B, B])(self))
 
    /**
     * @ f \`orElse\` g @ : directional choice: if f succeeds, the result of f is the result, else g is applied
@@ -99,8 +99,8 @@ trait ArrowIf[=>>[-_, +_]] extends ArrowList[=>>] {
     * tag a value with Left or Right, if arrow has success, input is tagged with Left, else with Right
     */
    def tagA[A, B](a : A =>> B) : (A =>> Either[A, A]) = {
-      val left : A ⇒ Either[A, A] = Left.apply _
-      val right : A ⇒ Either[A, A] = Right.apply _
+      val left : A ⇒ Either[A, A] = Left.apply[A, A] _
+      val right : A ⇒ Either[A, A] = Right.apply[A, A] _
 
       ifA(a)(arr(left))(arr(right))
    }

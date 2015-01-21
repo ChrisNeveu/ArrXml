@@ -110,7 +110,7 @@ trait ArrowList[=>>[-_, +_]] extends ArrowPlus[=>>] with ArrowApply[=>>] {
    /**
     * the zero arrow, alias for zeroArrow
     */
-   def none[B, C] : B =>> C = zeroArrow
+   def none[B, C] : B =>> C = zeroArrow[B, C]
 
    /**
     * converts an arrow, that may fail, into an arrow that always succeeds
